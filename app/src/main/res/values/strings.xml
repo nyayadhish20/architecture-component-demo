@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">ImageSearch</string>
+    <string name="two">2</string>
+    <string name="three">3</string>
+    <string name="four">4</string>
+    <string name="img_desc">Description</string>
+    <string name="hint">Search...</string>
+</resources>
