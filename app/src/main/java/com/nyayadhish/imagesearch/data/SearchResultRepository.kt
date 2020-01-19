@@ -14,21 +14,24 @@ class SearchResultRepository private constructor(private val searchResultDao: Se
     private var query: String = ""
     private var startIndex = ""
 
-    fun getSearchResult(searchQuery: String,pageNumber:String): LiveData<List<Items>>{
+    fun getSearchResult(searchQuery: String, pageNumber: String): LiveData<List<Items>> {
         query = searchQuery
         this.startIndex = pageNumber
         getImages()
         return searchResultDao.getSearchResults()
-
     }
 
-    fun updateSearchResult(mList:List<Items>){
+    /**
+     * Update the DAO for search results
+     */
+    fun updateSearchResult(mList: List<Items>) {
         searchResultDao.updateSearchResults(mList)
     }
-    companion object {
 
+    companion object {
         // For Singleton instantiation
-        @Volatile private var instance: SearchResultRepository? = null
+        @Volatile
+        private var instance: SearchResultRepository? = null
 
         fun getInstance(searchResultDao: SearchResultDao) =
             instance ?: synchronized(this) {
@@ -36,12 +39,19 @@ class SearchResultRepository private constructor(private val searchResultDao: Se
             }
     }
 
-    fun getImages(): LiveData<List<Items>>{
+    /**
+     * Retrofit API call for get Images
+     */
+    private fun getImages(): LiveData<List<Items>> {
         val tempList: MutableLiveData<List<Items>> = MutableLiveData()
-        mImageCall = APIService.getBaseUrl().getImages(Constants.GOOGLE_KEY
+        mImageCall = APIService.getBaseUrl().getImages(
+            Constants.GOOGLE_KEY
             , Constants.CX
-        , query,Constants.SEARCH_TYPE,startIndex)
-        mImageCall!!.enqueue(object : CustomisedRetroCallbacks<SearchImage>(){
+            , query
+            , Constants.SEARCH_TYPE
+            , startIndex
+        )
+        mImageCall!!.enqueue(object : CustomisedRetroCallbacks<SearchImage>() {
             override fun hideProgress() {
 
             }
@@ -53,8 +63,9 @@ class SearchResultRepository private constructor(private val searchResultDao: Se
             override fun onSuccess(response: SearchImage?) {
                 debugLog(response?.items?.size.toString())
                 response?.items?.let {
-                     tempList.value = it
-                     updateSearchResult(it) }
+                    tempList.value = it
+                    updateSearchResult(it)
+                }
             }
 
             override fun onError(response: SearchImage?) {
@@ -69,6 +80,9 @@ class SearchResultRepository private constructor(private val searchResultDao: Se
         return tempList
     }
 
+    fun clearSearchResult() {
+        searchResultDao.clearSearchResults()
+    }
 
 
 }

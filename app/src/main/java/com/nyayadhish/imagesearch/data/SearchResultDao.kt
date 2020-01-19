@@ -29,7 +29,12 @@ class SearchResultDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(imageList: List<Items>) {
 
+    }
 
+    @Query("DELETE FROM items")
+    fun clearSearchResults() {
+        searchResultList.clear()
+        searchResult.postValue(searchResultList)
     }
 
 }
